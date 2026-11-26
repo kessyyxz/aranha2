@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat com o Homem-Aranha 🕷️</title>
+    <link rel="stylesheet" href="stylew.css">
+</head>
+
+
+
+
+<body>
+    <a href="index.html" class="btn-sair">
+        ⬅ Sair
+    </a>
+
+    <div class="chat-container">
+        
+        <div class="chat-header">
+            <div class="avatar">🕷️</div>
+            <div class="status-info">
+                <h2>Seu Amigo da Vizinhança</h2>
+                <p><span class="status-dot">●</span> No topo de um prédio</p>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message spidey">
+                E aí! Beleza? Aqui é o Homem-Aranha! Mande sua mensagem antes que o dever me chame! 🕸️🔴🔵
+            </div>
+        </div>
+
+        <form class="chat-input-area-fake" id="chatForm">
+            <input type="text" id="userInput" class="input-placeholder" placeholder="Escreva uma mensagem para o Aranha..." required autocomplete="off">
+            <button type="submit" class="btn-fake" id="btnEnviar">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        // Puxa o nome salvo no login (ou usa 'Herói' como padrão caso falhe)
+        const nomeUsuario = localStorage.getItem('usuarioLogado') || 'Herói';
+    
+        const chatForm = document.querySelector('#chatForm');
+        const userInput = document.querySelector('#userInput');
+        const chatMessages = document.querySelector('#chatMessages');
+        const btnEnviar = document.querySelector('#btnEnviar');
+    
+        // 1. Atualiza a mensagem inicial visualmente assim que a página carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            chatMessages.innerHTML = `
+                <div class="message spidey">
+                    E aí, ${nomeUsuario}! Beleza? Aqui é o Homem-Aranha! Mande sua mensagem antes que o dever me chame! 🕸️🔴🔵
+                </div>
+            `;
+        });
+    
+        // 2. Cria o histórico já com uma instrução de "sistema" (system prompt) 
+        // para a IA saber qual é o nome do usuário e como agir.
+        const historico = [
+            { 
+                role: 'system', 
+                content: `Você é o Homem-Aranha. Você está conversando com o usuário chamado ${nomeUsuario}. Chame-o pelo nome durante a conversa de forma amigável e heróica.` 
+            }
+        ];
+    
+        chatForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+    
+            const textoMensagem = userInput.value.trim();
+            if (!textoMensagem) return;
+    
+            // Cria a div da mensagem do usuário
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            userDiv.innerText = textoMensagem;
+            chatMessages.appendChild(userDiv);
+    
+            // Adiciona a mensagem do usuário no histórico
+            historico.push({ role: 'user', content: textoMensagem });
+    
+            userInput.value = '';
+            btnEnviar.disabled = true;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+            // Cria o feedback de "Digitando..."
+            const spideyDivTemp = document.createElement('div');
+            spideyDivTemp.className = 'message spidey';
+            spideyDivTemp.innerText = 'Digitando... 🕸️';
+            chatMessages.appendChild(spideyDivTemp);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+            try {
+                // Envia o histórico completo (com a instrução do nome) para o seu servidor
+                const resposta = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: textoMensagem,
+                        historico: historico
+                    })
+                });
+    
+                const dados = await resposta.json();
+                spideyDivTemp.remove();
+    
+                if (!resposta.ok) {
+                    throw new Error(dados.erro || 'Erro na resposta do servidor');
+                }
+    
+                // Salva a resposta da IA no histórico
+                historico.push({ role: 'assistant', content: dados.reply });
+    
+                // Exibe a resposta na tela
+                const spideyDiv = document.createElement('div');
+                spideyDiv.className = 'message spidey';
+                spideyDiv.innerText = dados.reply;
+                chatMessages.appendChild(spideyDiv);
+    
+            } catch (erro) {
+                spideyDivTemp.remove();
+                historico.pop(); // Remove a última tentativa do usuário do histórico em caso de erro
+    
+                const erroDiv = document.createElement('div');
+                erroDiv.className = 'message spidey';
+                erroDiv.style.background = '#333';
+                erroDiv.style.color = '#ff4d4d';
+                erroDiv.innerText = `Erro: ${erro.message}`;
+                chatMessages.appendChild(erroDiv);
+            } finally {
+                btnEnviar.disabled = false;
+                userInput.focus();
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>

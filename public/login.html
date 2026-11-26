@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição - Homem-Aranha</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: url('177780-spider_man-chroma_key-miles_morales-superhero-comics-1920x1080.jpg') no-repeat center center fixed; background-size: cover;">
+
+    <main class="spider-container">
+        <header class="spider-header">
+            <h1>Teia de Contatos</h1>
+            <h2>Deixe seus dados com o amigão da vizinhança!</h2>
+        </header>
+
+        <form class="spider-form">
+            <div class="input-group">
+                <label for="cadUsuario">Nome de Usuário:</label>
+                <input type="text" id="cadUsuario" name="usuario" placeholder="Ex: PeterParker" required>
+            </div>
+
+            <div class="input-group">
+                <label for="cadSenha">Senha Secreta:</label>
+                <input type="password" id="cadSenha" name="senha" placeholder="Digite sua senha" required>
+            </div>
+
+            <button type="button" id="btnCadastrar" style="width: 100%;">Lançar Teia</button>
+
+            <div id="msgCadastro" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
+        </form>
+        <a href="index.html" class="link-login">Não tem uma conta? Faça seu cadastro</a></main>
+
+<script>
+    const btnCadastrar = document.querySelector('#btnCadastrar');
+    const msgCadastro = document.querySelector('#msgCadastro');
+
+    btnCadastrar.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const usuario = document.querySelector('#cadUsuario').value.trim();
+        const senha = document.querySelector('#cadSenha').value.trim();
+
+        const localUsuario = localStorage.getItem('usuarioSalvo');
+        const localSenha = localStorage.getItem('senhaSalva');
+
+        if (!usuario || !senha) {
+            msgCadastro.style.color = '#ff4d4d';
+            msgCadastro.innerText = 'Preencha o nome de usuário e a senha!';
+            return;
+        }
+
+        if (!localUsuario || !localSenha) {
+            msgCadastro.style.color = '#ff4d4d';
+            msgCadastro.innerText = 'Nenhuma conta encontrada! Você precisa fazer o cadastro primeiro.';
+            return;
+        }
+
+        if (usuario !== localUsuario) {
+            msgCadastro.style.color = '#ff4d4d';
+            msgCadastro.innerText = 'Usuário não cadastrado ou incorreto!';
+            return;
+        }
+
+        if (senha !== localSenha) {
+            msgCadastro.style.color = '#ff4d4d';
+            msgCadastro.innerText = 'Senha incorreta! Tente novamente.';
+            return;
+        }
+
+// Salva o nome de quem acabou de logar para usar no chat
+localStorage.setItem('usuarioLogado', usuario);
+
+msgCadastro.style.color = '#4cd137';
+msgCadastro.innerText = `Acesso liberado, ${usuario}!`;
+
+setTimeout(() => {
+    // Corrigido: não precisa do 'dados.usuario', o 'usuarioLogado' já foi salvo acima
+    window.location.href = 'chat.html';
+}, 1000);
+});
+</script>
+    
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Teia de Contatos</title>
+    <link rel="stylesheet" href="spider.css">
+    <style>
+        body {
+            background-image: url('spider.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div class="cadastro-container">
+        <h2>Cadastro</h2>
+        <label for="cadUsuario">Nome</label>
+        <input type="text" id="cadUsuario" placeholder="Digite seu nome">
+        <label for="cadEmail">Email</label>
+        <input type="email" id="cadEmail" placeholder="Digite seu gmail">
+        <label for="cadSenha">Senha</label>
+        <input type="password" id="cadSenha" placeholder="Digite sua senha">
+        <button id="btnCadastrar">Lançar Cadastro</button>
+        <span id="mensagemCadastro"></span>
+        <a href="login.html" class="link-login">Já tem uma conta? Faça login</a>
+    </div>
+
+    <script>
+        const btnCadastrar = document.querySelector('#btnCadastrar');
+        const mensagemCadastro = document.querySelector('#mensagemCadastro');
+
+        btnCadastrar.addEventListener('click', () => {
+            const usuario = document.querySelector('#cadUsuario').value;
+            const email = document.querySelector('#cadEmail').value;
+            const senha = document.querySelector('#cadSenha').value;
+
+            if (!usuario || !email || !senha) {
+                mensagemCadastro.style.color = '#e23636';
+                mensagemCadastro.innerText = 'Preencha todos os campos da teia!';
+                return;
+            }
+
+            localStorage.setItem('usuarioSalvo', usuario);
+            localStorage.setItem('emailSalvo', email);
+            localStorage.setItem('senhaSalva', senha);
+
+            mensagemCadastro.style.color = '#4cd137';
+            mensagemCadastro.innerText = 'Cadastro realizado com sucesso!';
+
+            document.querySelector('#cadUsuario').value = '';
+            document.querySelector('#cadEmail').value = '';
+            document.querySelector('#cadSenha').value = '';
+
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
+
